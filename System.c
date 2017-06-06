@@ -117,7 +117,7 @@ void ShowInfo()
         printf("验证成功 正在进入系统");
         SetPosition(MARGIN_X + 33, INFO_START_Y + 7);
         printf("请稍后");
-//        Sleep(3000);
+        Sleep(3000);
         Clear(MARGIN_X + 1, INFO_START_Y + 1, 16);
         ShowUser();
     }
@@ -163,6 +163,7 @@ void UserChoice()
             break;
         case '2':
             Clear(MARGIN_X, INFO_END_Y + 4, 5);
+            Choice2();
             ShowUser();
             break;
         case '3':
@@ -171,14 +172,13 @@ void UserChoice()
             ShowUser();
             break;
         case '4':
-            printf("4");
             Clear(MARGIN_X, INFO_END_Y + 4, 5);
+            Choice4();
             ShowUser();
             break;
         case '5':
-            printf("5");
-            Clear(MARGIN_X, INFO_END_Y + 4, 5);
-            ShowUser();
+            system("cls");//清屏
+            exit(0);
             break;
         }
     }
@@ -263,11 +263,18 @@ void Choice1()
             fwrite(&InputStd, sizeof(STD), 1, fl);
             SetPosition(MARGIN_X + 21 + 8, INFO_START_Y + 12 + 6);
             printf("保存成功 是否继续录入(按Y继续录入 其他键退出...)");
+//            for(i = 0; i < 100; i++)
+//            {
+//                rewind(fl);
+//                InputStd.English++;
+//                fwrite(&InputStd, sizeof(STD), 1, fl);
+//            }
             fclose(fl);
             gochoice = getch();
             Clear(MARGIN_X + 1, INFO_START_Y + 1, 18);
         }
         while(gochoice == 'y'||gochoice == 'Y');
+
         fclose(fl);
         Clear(MARGIN_X + 1, INFO_START_Y + 1, 18);
         break;
@@ -360,12 +367,17 @@ void Choice1()
         break;
     }
 }
+void Choice2()
+{
+
+}
 void Choice3()
 {
     FILE * fl;
-    int count = 0, i,j,page, * sum;
+    int count = 0, i,j,page,pagenow,rank = 1;
+    float *sum,ave[3] = {0,0,0};
     STD OutputStd, * tempdata,temp;
-    char rankchoice;
+    char rankchoice,act,choice;
     Clear(MARGIN_X + 1, INFO_START_Y + 1, 18);
     form1(24, 8, 24, 3);
     SetPosition(MARGIN_X + 28, INFO_START_Y + 6);
@@ -401,46 +413,363 @@ void Choice3()
     {
     case'1':
         Clear(MARGIN_X + 1, INFO_START_Y + 1, 18);
-        for(i = 0; i < 19; i++)
-        {
-            SetPosition(MARGIN_X + 39, INFO_START_Y + i);
-            printf("|");
-        }
-        sum = (int *)malloc(count * sizeof(int));
+        sum = (float *)malloc(count * sizeof(float));
         for(i = 0; i < count; i++)
         {
             sum[i] += tempdata[i].math + tempdata[i].English;
+            ave[0] += tempdata[i].math + tempdata[i].English;
+            ave[1] += tempdata[i].math;
+            ave[2] += tempdata[i].English;
         }
-        for(i = 0;i < count;i++)
-		{
-			for(j = 0;j < count - i - 1;j++)
-			{
-				if(tempdata[j].English + tempdata[j].math < tempdata[j + 1].English + tempdata[j + 1].math )
-				{
-					temp = tempdata[j];
-					tempdata[j] = tempdata[j + 1];
-					tempdata[j + 1] = temp;
-				}
-			}
-		}
-        page = count / 34 + 1;
-        SetPosition(MARGIN_X + 70,INFO_START_Y + 18);
-        printf("共 %d 页",page);
+        for(i = 0; i < count; i++)
+        {
+            for(j = 0; j < count - i - 1; j++)
+            {
+                if(tempdata[j].English + tempdata[j].math < tempdata[j + 1].English + tempdata[j + 1].math )
+                {
+                    temp = tempdata[j];
+                    tempdata[j] = tempdata[j + 1];
+                    tempdata[j + 1] = temp;
+                }
+            }
+        }
+        //共 %d 位同学
+        page = count / 18 + 1;
+        pagenow = 1;
+        SetPosition(MARGIN_X + 4,INFO_START_Y + 21);
+        printf("共 %d 名同学 总分平均分:%.2lf 数学平均分:%.2lf 英语平均分:%.2lf",count,ave[0] / count,ave[1] / count,ave[2] / count);
+        SetPosition(MARGIN_X +15,INFO_START_Y + 20);
+        printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
         SetPosition(MARGIN_X + 1,INFO_START_Y );
-        printf("学号     姓名    数学    英语    总分");
-        SetPosition(MARGIN_X + 40,INFO_START_Y);
-        printf("学号     姓名    数学    英语    总分");
-        for(i = 0;i < 17;i++)
-		{
-			 SetPosition(MARGIN_X + 1,INFO_START_Y + 1 + i);
-			 printf("%s   %s   %d   %d   %d",tempdata[i].num,tempdata[i].name,tempdata[i].math,tempdata[i].English,tempdata[i].math + tempdata[i].English);
-		}
+        printf("序号 学号    姓名     性别    专业     班级   数学成绩    英语成绩    总分");
 
+        while(1)
+        {
+            if(pagenow == page)
+            {
+                for(i = (pagenow - 1) * 18,j = 0,rank = (pagenow - 1) * 18 + 1 ; i < count; i++,rank++,j++)
+                {
+                    SetPosition(MARGIN_X + 1,INFO_START_Y + 1 + j);
+                    printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-13d%-9d%d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].math,tempdata[i].English,(tempdata[i].math) + (tempdata[i].English));
+                }
+            }
+            else
+            {
+                for(i = (pagenow - 1) * 18,j = 0,rank = (pagenow - 1) * 18 + 1; i <  pagenow  * 18 ; i++,rank++,j++)
+                {
+                    SetPosition(MARGIN_X + 1,INFO_START_Y + 1 + j);
+                    printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-13d%-9d%d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].math,tempdata[i].English,(tempdata[i].math) + (tempdata[i].English));
+                }
+            }
+            act = getch();
+            switch(act)
+            {
+            case 72:
+                pagenow = 1;
+                SetPosition(MARGIN_X +15,INFO_START_Y + 20);
+                printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
+                for(i = 0; i < count; i++)
+                {
+                    for(j = 0; j < count - i - 1; j++)
+                    {
+                        if(tempdata[j].English + tempdata[j].math > tempdata[j + 1].English + tempdata[j + 1].math )
+                        {
+                            temp = tempdata[j];
+                            tempdata[j] = tempdata[j + 1];
+                            tempdata[j + 1] = temp;
+                        }
+                    }
+                }
+
+                break;
+            case 80:
+                pagenow = 1;
+                SetPosition(MARGIN_X +15,INFO_START_Y + 20);
+                printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
+                for(i = 0; i < count; i++)
+                {
+                    for(j = 0; j < count - i - 1; j++)
+                    {
+                        if(tempdata[j].English + tempdata[j].math < tempdata[j + 1].English + tempdata[j + 1].math )
+                        {
+                            temp = tempdata[j];
+                            tempdata[j] = tempdata[j + 1];
+                            tempdata[j + 1] = temp;
+                        }
+                    }
+                }
+                break;
+            case 75:
+                Clear(MARGIN_X + 1,INFO_START_Y + 20,1);
+                if(pagenow > 1)
+                    pagenow--;
+                SetPosition(MARGIN_X +15,INFO_START_Y + 20);
+                printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
+                Clear(MARGIN_X + 1, INFO_START_Y + 1, 18);
+                break;
+            case 77:
+                Clear(MARGIN_X + 1,INFO_START_Y + 20,1);
+                if(pagenow < page)
+                    pagenow++;
+                SetPosition(MARGIN_X +15,INFO_START_Y + 20);
+                printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
+                Clear(MARGIN_X + 1, INFO_START_Y + 1, 18);
+                break;
+            case '0':
+                Clear(MARGIN_X + 1,INFO_START_Y + 20,2);
+                Clear(MARGIN_X + 1,INFO_START_Y + 20,1);
+                break;
+            }
+            if(act == '0')
+                break;
+        }
+        Clear(MARGIN_X + 1, INFO_START_Y, 19);
         break;
     case'2':
+        Clear(MARGIN_X + 1, INFO_START_Y, 18);
+        form1(24, 8, 24, 3);
+        SetPosition(MARGIN_X + 28, INFO_START_Y + 6);
+        printf("1、英语成绩排名");
+        SetPosition(MARGIN_X + 28, INFO_START_Y + 7);
+        printf("2、数学成绩排名");
+        SetPosition(MARGIN_X + 28, INFO_START_Y + 8);
+        printf("3、返回到主菜单");
+        while(1)
+        {
+            choice = getch();
+            if(choice == '1' || choice == '2' || choice == '3')
+                break;
+        }
+        switch(choice)
+        {
+        case '1':
+            Clear(MARGIN_X + 1, INFO_START_Y + 1, 18);
+            for(i = 0; i < count; i++)
+            {
+                ave[2] += tempdata[i].English;
+            }
+            for(i = 0; i < count; i++)
+            {
+                for(j = 0; j < count - i - 1; j++)
+                {
+                    if(tempdata[j].English < tempdata[j + 1].English)
+                    {
+                        temp = tempdata[j];
+                        tempdata[j] = tempdata[j + 1];
+                        tempdata[j + 1] = temp;
+                    }
+                }
+            }
+            page = count / 18 + 1;
+            pagenow = 1;
+            SetPosition(MARGIN_X + 24,INFO_START_Y + 21);
+            printf("共 %d 名同学 英语平均分:%.2lf",count,ave[2] / count);
+            SetPosition(MARGIN_X +15,INFO_START_Y + 20);
+            printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
+            SetPosition(MARGIN_X + 10,INFO_START_Y );
+            printf("序号 学号    姓名     性别    专业     班级   英语成绩    ");
+
+            while(1)
+            {
+                if(pagenow == page)
+                {
+                    for(i = (pagenow - 1) * 18,j = 0,rank = (pagenow - 1) * 18 + 1 ; i < count; i++,rank++,j++)
+                    {
+                        SetPosition(MARGIN_X + 10,INFO_START_Y + 1 + j);
+                        printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-9d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].English);
+                    }
+                }
+                else
+                {
+                    for(i = (pagenow - 1) * 18,j = 0,rank = (pagenow - 1) * 18 + 1; i <  pagenow  * 18 ; i++,rank++,j++)
+                    {
+                        SetPosition(MARGIN_X + 10,INFO_START_Y + 1 + j);
+                        printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-9d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,(tempdata[i].English));
+                    }
+                }
+                act = getch();
+                switch(act)
+                {
+                case 72:
+                    pagenow = 1;
+                    SetPosition(MARGIN_X +15,INFO_START_Y + 20);
+                    printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
+                    for(i = 0; i < count; i++)
+                    {
+                        for(j = 0; j < count - i - 1; j++)
+                        {
+                            if(tempdata[j].English > tempdata[j + 1].English)
+                            {
+                                temp = tempdata[j];
+                                tempdata[j] = tempdata[j + 1];
+                                tempdata[j + 1] = temp;
+                            }
+                        }
+                    }
+
+                    break;
+                case 80:
+                    pagenow = 1;
+                    SetPosition(MARGIN_X +15,INFO_START_Y + 20);
+                    printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
+                    for(i = 0; i < count; i++)
+                    {
+                        for(j = 0; j < count - i - 1; j++)
+                        {
+                            if(tempdata[j].English< tempdata[j + 1].English)
+                            {
+                                temp = tempdata[j];
+                                tempdata[j] = tempdata[j + 1];
+                                tempdata[j + 1] = temp;
+                            }
+                        }
+                    }
+                    break;
+                case 75:
+                    Clear(MARGIN_X + 1,INFO_START_Y + 20,1);
+                    if(pagenow > 1)
+                        pagenow--;
+                    SetPosition(MARGIN_X +15,INFO_START_Y + 20);
+                    printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
+                    Clear(MARGIN_X + 1, INFO_START_Y + 1, 18);
+                    break;
+                case 77:
+                    Clear(MARGIN_X + 1,INFO_START_Y + 20,1);
+                    if(pagenow < page)
+                        pagenow++;
+                    SetPosition(MARGIN_X +15,INFO_START_Y + 20);
+                    printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
+                    Clear(MARGIN_X + 1, INFO_START_Y + 1, 18);
+                    break;
+                case '0':
+                    Clear(MARGIN_X + 1,INFO_START_Y + 20,2);
+                    Clear(MARGIN_X + 1,INFO_START_Y + 20,1);
+                    break;
+                }
+                if(act == '0')
+                    break;
+            }
+
+
+
+            break;
+        case '2':
+            Clear(MARGIN_X + 1, INFO_START_Y + 1, 18);
+            for(i = 0; i < count; i++)
+            {
+                ave[1] += tempdata[i].math;
+            }
+            for(i = 0; i < count; i++)
+            {
+                for(j = 0; j < count - i - 1; j++)
+                {
+                    if(tempdata[j].math < tempdata[j + 1].math)
+                    {
+                        temp = tempdata[j];
+                        tempdata[j] = tempdata[j + 1];
+                        tempdata[j + 1] = temp;
+                    }
+                }
+            }
+            page = count / 18 + 1;
+            pagenow = 1;
+            SetPosition(MARGIN_X + 24,INFO_START_Y + 21);
+            printf("共 %d 名同学 数学平均分:%.2lf",count,ave[1] / count);
+            SetPosition(MARGIN_X +15,INFO_START_Y + 20);
+            printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
+            SetPosition(MARGIN_X + 10,INFO_START_Y );
+            printf("序号 学号    姓名     性别    专业     班级   数学成绩    ");
+
+            while(1)
+            {
+                if(pagenow == page)
+                {
+                    for(i = (pagenow - 1) * 18,j = 0,rank = (pagenow - 1) * 18 + 1 ; i < count; i++,rank++,j++)
+                    {
+                        SetPosition(MARGIN_X + 10,INFO_START_Y + 1 + j);
+                        printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-9d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].math);
+                    }
+                }
+                else
+                {
+                    for(i = (pagenow - 1) * 18,j = 0,rank = (pagenow - 1) * 18 + 1; i <  pagenow  * 18 ; i++,rank++,j++)
+                    {
+                        SetPosition(MARGIN_X + 10,INFO_START_Y + 1 + j);
+                        printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-9d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,(tempdata[i].math));
+                    }
+                }
+                act = getch();
+                switch(act)
+                {
+                case 72:
+                    pagenow = 1;
+                    SetPosition(MARGIN_X +15,INFO_START_Y + 20);
+                    printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
+                    for(i = 0; i < count; i++)
+                    {
+                        for(j = 0; j < count - i - 1; j++)
+                        {
+                            if(tempdata[j].math > tempdata[j + 1].math)
+                            {
+                                temp = tempdata[j];
+                                tempdata[j] = tempdata[j + 1];
+                                tempdata[j + 1] = temp;
+                            }
+                        }
+                    }
+
+                    break;
+                case 80:
+                    pagenow = 1;
+                    SetPosition(MARGIN_X +15,INFO_START_Y + 20);
+                    printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
+                    for(i = 0; i < count; i++)
+                    {
+                        for(j = 0; j < count - i - 1; j++)
+                        {
+                            if(tempdata[j].math< tempdata[j + 1].math)
+                            {
+                                temp = tempdata[j];
+                                tempdata[j] = tempdata[j + 1];
+                                tempdata[j + 1] = temp;
+                            }
+                        }
+                    }
+                    break;
+                case 75:
+                    Clear(MARGIN_X + 1,INFO_START_Y + 20,1);
+                    if(pagenow > 1)
+                        pagenow--;
+                    SetPosition(MARGIN_X +15,INFO_START_Y + 20);
+                    printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
+                    Clear(MARGIN_X + 1, INFO_START_Y + 1, 18);
+                    break;
+                case 77:
+                    Clear(MARGIN_X + 1,INFO_START_Y + 20,1);
+                    if(pagenow < page)
+                        pagenow++;
+                    SetPosition(MARGIN_X +15,INFO_START_Y + 20);
+                    printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
+                    Clear(MARGIN_X + 1, INFO_START_Y + 1, 18);
+                    break;
+                case '0':
+                    Clear(MARGIN_X + 1,INFO_START_Y + 20,2);
+                    Clear(MARGIN_X + 1,INFO_START_Y + 20,1);
+                    break;
+                }
+                if(act == '0')
+                    break;
+            }
+            break;
+        case '3':
+            break;
+        }
+        Clear(MARGIN_X + 1, INFO_START_Y, 19);
         break;
     case'3':
-        Clear(MARGIN_X + 1, INFO_START_Y + 1, 18);
+        free(tempdata);
+        free(sum);
+        Clear(MARGIN_X + 1, INFO_START_Y, 19);
         break;
     }
 
@@ -464,6 +793,48 @@ void form1(int m, int n, int x, int y)//在信息框的X Y中 打印n行m列的小框框
     SetPosition(MARGIN_X + x, INFO_START_Y + y + n);
     for(i = 0; i < m + 1; i++)
         printf("-");
+}
+
+void Choice4()
+{
+    PlaySound(TEXT("sounds\\大连海事大学校歌.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+    char press;
+    SetPosition(MARGIN_X + 24,INFO_START_Y );
+    printf("渤海畔，黄海滨 集合着大海的灵魂");
+    SetPosition(MARGIN_X + 27,INFO_START_Y + 1 );
+    printf("扬气慨，抖精神浩海纵鹏鲲");
+    SetPosition(MARGIN_X + 30,INFO_START_Y + 2 );
+    printf("啊，海大  啊，大海");
+    SetPosition(MARGIN_X + 29,INFO_START_Y + 3 );
+    printf("抒手放飞理想畅怀奔腾");
+    SetPosition(MARGIN_X + 29,INFO_START_Y + 4 );
+    printf("奔腾，奔腾，奔腾青春");
+    SetPosition(MARGIN_X + 24,INFO_START_Y + 8);
+    printf("知路远，守本根 肩负着中华的责任");
+    SetPosition(MARGIN_X + 27,INFO_START_Y + 9 );
+    printf("扬气慨，抖精神青史见功勋");
+    SetPosition(MARGIN_X + 30,INFO_START_Y + 10 );
+    printf("啊，海大  啊，大海");
+    SetPosition(MARGIN_X + 29,INFO_START_Y + 11 );
+    printf("曙光托起希望放眼世界");
+    SetPosition(MARGIN_X + 29,INFO_START_Y + 12 );
+    printf("世界，世界，世界风云");
+    SetPosition(MARGIN_X + 33,INFO_START_Y + 13 );
+    printf("放眼世界风云");
+    SetPosition(MARGIN_X +68,INFO_START_Y + 18 );
+    printf("(按0退出)");
+    SetPosition(MARGIN_X +100,INFO_START_Y + 100 );
+    while(1)
+    {
+        press = getch();
+        if(press == '0')
+        {
+            PlaySound(NULL, NULL, NULL);  //音乐停止
+            Clear(MARGIN_X + 1, INFO_START_Y, 19);
+            break;
+        }
+
+    }
 }
 char * s_gets(char * st, int n)
 {
