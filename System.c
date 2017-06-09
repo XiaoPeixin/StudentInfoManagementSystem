@@ -1,10 +1,10 @@
-/**
+/***************************************************
  * 文件名：System.c
  * 描述：欢迎页、信息页、用户界面和其他咋想的函数
  * 作者：Creams
  * 时间：2017年5月30日
  * 版权：Creams
- */
+ ****************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -374,7 +374,7 @@ void Choice2()
 void Choice3()
 {
     FILE * fl;
-    int count = 0, i,j,page,pagenow,rank = 1;
+    int count = 0, i,j,page,pagenow,rank = 1,upanddown = 1;
     float *sum,ave[3] = {0,0,0};
     STD OutputStd, * tempdata,temp;
     char rankchoice,act,choice;
@@ -441,7 +441,7 @@ void Choice3()
         SetPosition(MARGIN_X +15,INFO_START_Y + 20);
         printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
         SetPosition(MARGIN_X + 1,INFO_START_Y );
-        printf("序号 学号    姓名     性别    专业     班级   数学成绩    英语成绩    总分");
+        printf("排名 学号    姓名     性别    专业     班级   数学成绩    英语成绩    总分");
 
         while(1)
         {
@@ -450,7 +450,10 @@ void Choice3()
                 for(i = (pagenow - 1) * 18,j = 0,rank = (pagenow - 1) * 18 + 1 ; i < count; i++,rank++,j++)
                 {
                     SetPosition(MARGIN_X + 1,INFO_START_Y + 1 + j);
-                    printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-13d%-9d%d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].math,tempdata[i].English,(tempdata[i].math) + (tempdata[i].English));
+                    if(upanddown == 1)
+                        printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-13d%-9d%d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].math,tempdata[i].English,(tempdata[i].math) + (tempdata[i].English));
+                    else
+                        printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-13d%-9d%d",count - rank + 1,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].math,tempdata[i].English,(tempdata[i].math) + (tempdata[i].English));
                 }
             }
             else
@@ -458,7 +461,10 @@ void Choice3()
                 for(i = (pagenow - 1) * 18,j = 0,rank = (pagenow - 1) * 18 + 1; i <  pagenow  * 18 ; i++,rank++,j++)
                 {
                     SetPosition(MARGIN_X + 1,INFO_START_Y + 1 + j);
-                    printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-13d%-9d%d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].math,tempdata[i].English,(tempdata[i].math) + (tempdata[i].English));
+                    if(upanddown == 1)
+                        printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-13d%-9d%d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].math,tempdata[i].English,(tempdata[i].math) + (tempdata[i].English));
+                    else
+                        printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-13d%-9d%d",count - rank + 1,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].math,tempdata[i].English,(tempdata[i].math) + (tempdata[i].English));
                 }
             }
             act = getch();
@@ -466,6 +472,7 @@ void Choice3()
             {
             case 72:
                 pagenow = 1;
+                upanddown = -1;
                 SetPosition(MARGIN_X +15,INFO_START_Y + 20);
                 printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
                 for(i = 0; i < count; i++)
@@ -484,6 +491,7 @@ void Choice3()
                 break;
             case 80:
                 pagenow = 1;
+                upanddown = 1;
                 SetPosition(MARGIN_X +15,INFO_START_Y + 20);
                 printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
                 for(i = 0; i < count; i++)
@@ -560,6 +568,7 @@ void Choice3()
                     }
                 }
             }
+            upanddown = 1;
             page = count / 18 + 1;
             pagenow = 1;
             SetPosition(MARGIN_X + 24,INFO_START_Y + 21);
@@ -576,7 +585,10 @@ void Choice3()
                     for(i = (pagenow - 1) * 18,j = 0,rank = (pagenow - 1) * 18 + 1 ; i < count; i++,rank++,j++)
                     {
                         SetPosition(MARGIN_X + 10,INFO_START_Y + 1 + j);
-                        printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-9d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].English);
+                        if(upanddown == 1)
+                            printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-9d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].English);
+                        else
+                            printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-9d",count - rank + 1,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].English);
                     }
                 }
                 else
@@ -584,7 +596,10 @@ void Choice3()
                     for(i = (pagenow - 1) * 18,j = 0,rank = (pagenow - 1) * 18 + 1; i <  pagenow  * 18 ; i++,rank++,j++)
                     {
                         SetPosition(MARGIN_X + 10,INFO_START_Y + 1 + j);
-                        printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-9d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,(tempdata[i].English));
+                        if(upanddown == 1)
+                            printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-9d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].English);
+                        else
+                            printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-9d",count - rank + 1,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].English);
                     }
                 }
                 act = getch();
@@ -592,6 +607,7 @@ void Choice3()
                 {
                 case 72:
                     pagenow = 1;
+                    upanddown = -1;
                     SetPosition(MARGIN_X +15,INFO_START_Y + 20);
                     printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
                     for(i = 0; i < count; i++)
@@ -610,6 +626,7 @@ void Choice3()
                     break;
                 case 80:
                     pagenow = 1;
+                    upanddown = 1;
                     SetPosition(MARGIN_X +15,INFO_START_Y + 20);
                     printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
                     for(i = 0; i < count; i++)
@@ -650,10 +667,9 @@ void Choice3()
                     break;
             }
 
-
-
             break;
         case '2':
+            upanddown = 1;
             Clear(MARGIN_X + 1, INFO_START_Y + 1, 18);
             for(i = 0; i < count; i++)
             {
@@ -678,7 +694,7 @@ void Choice3()
             SetPosition(MARGIN_X +15,INFO_START_Y + 20);
             printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
             SetPosition(MARGIN_X + 10,INFO_START_Y );
-            printf("序号 学号    姓名     性别    专业     班级   数学成绩    ");
+            printf("排名 学号    姓名     性别    专业     班级   数学成绩    ");
 
             while(1)
             {
@@ -687,7 +703,10 @@ void Choice3()
                     for(i = (pagenow - 1) * 18,j = 0,rank = (pagenow - 1) * 18 + 1 ; i < count; i++,rank++,j++)
                     {
                         SetPosition(MARGIN_X + 10,INFO_START_Y + 1 + j);
-                        printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-9d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].math);
+                        if(upanddown == 1)
+                            printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-9d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].math);
+                        else
+                            printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-9d",count - rank + 1,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].math);
                     }
                 }
                 else
@@ -695,7 +714,11 @@ void Choice3()
                     for(i = (pagenow - 1) * 18,j = 0,rank = (pagenow - 1) * 18 + 1; i <  pagenow  * 18 ; i++,rank++,j++)
                     {
                         SetPosition(MARGIN_X + 10,INFO_START_Y + 1 + j);
-                        printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-9d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,(tempdata[i].math));
+                        if(upanddown == 1)
+                            printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-9d",rank,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].math);
+                        else
+                            printf(" %-5d%-5s %-10s %-s    %--12s%-7d%-9d",count - rank + 1,tempdata[i].num,tempdata[i].name,tempdata[i].sex,tempdata[i].major,tempdata[i].classNo,tempdata[i].math);
+
                     }
                 }
                 act = getch();
@@ -703,6 +726,7 @@ void Choice3()
                 {
                 case 72:
                     pagenow = 1;
+                    upanddown = -1;
                     SetPosition(MARGIN_X +15,INFO_START_Y + 20);
                     printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
                     for(i = 0; i < count; i++)
@@ -721,6 +745,7 @@ void Choice3()
                     break;
                 case 80:
                     pagenow = 1;
+                    upanddown = 1;
                     SetPosition(MARGIN_X +15,INFO_START_Y + 20);
                     printf("第 %d 页 共 %d 页(左右键翻页 上下键升降序 按0退出)",pagenow,page);
                     for(i = 0; i < count; i++)
